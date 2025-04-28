@@ -1,115 +1,133 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz ze słówek</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz ze słówek</title>
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #74ebd5, #ACB6E5);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      background: linear-gradient(to right, #f8f9fa, #e0e0e0);
+      margin: 0;
+      padding: 20px;
     }
-    .quiz-container {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        width: 90%;
-        max-width: 400px;
+    #word {
+      font-size: 32px;
+      margin-bottom: 20px;
     }
-    input[type="text"] {
-        padding: 10px;
-        width: 80%;
-        margin: 15px 0;
-        border: 2px solid #74ebd5;
-        border-radius: 10px;
-        font-size: 1rem;
+    #input {
+      padding: 10px;
+      font-size: 18px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
     }
-    button {
-        padding: 10px 20px;
-        font-size: 1rem;
-        background-color: #74ebd5;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+    #check {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-bottom: 20px;
     }
-    button:hover {
-        background-color: #4ac1c0;
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
     }
-    .summary {
-        margin-top: 20px;
-    }
-</style>
+  </style>
 </head>
 <body>
-<div class="quiz-container">
-    <h2 id="polish-word">Słówko</h2>
-    <input type="text" id="answer" placeholder="Wpisz po angielsku">
-    <br>
-    <button onclick="checkAnswer()">Sprawdź</button>
-    <div class="summary" id="summary"></div>
+
+<div id="quiz">
+  <div id="word"></div>
+  <input type="text" id="input" placeholder="Wpisz po angielsku">
+  <button id="check">Sprawdź</button>
+  <div id="feedback"></div>
 </div>
+
+<div id="result" style="display:none;"></div>
 
 <script>
 const words = [
-    { polish: "równość", english: "equality" },
-    { polish: "dziczyzna", english: "game" },
-    { polish: "kopalnia", english: "mine" },
-    { polish: "mieć ochotę na coś / chcieć coś", english: "fancy" },
-    { polish: "zainteresowanie, uwaga", english: "attention" },
-    { polish: "mielone mięso", english: "mince meat" },
-    { polish: "handlować", english: "to trade" },
-    { polish: "potomkowie", english: "descendants" },
-    { polish: "obsada, lista wykonawców", english: "line-up" },
-    { polish: "obalać, powalić", english: "bring down" }
+  { pl: "równość", en: "equality" },
+  { pl: "dziczyzna", en: "game" },
+  { pl: "kopalnia", en: "mine" },
+  { pl: "mieć ochotę na coś, chcieć coś", en: "fancy" },
+  { pl: "zainteresowanie, uwaga", en: "attention" },
+  { pl: "mielone mięso", en: "mince meat" },
+  { pl: "handlować", en: "to trade" },
+  { pl: "potomkowie", en: "descendants" },
+  { pl: "obsada, lista wykonawców", en: "line-up" },
+  { pl: "obalać, powalić", en: "bring down" },
 ];
 
 let current = 0;
 let correct = 0;
+let answers = [];
+
+const wordDiv = document.getElementById('word');
+const input = document.getElementById('input');
+const checkButton = document.getElementById('check');
+const feedbackDiv = document.getElementById('feedback');
+const resultDiv = document.getElementById('result');
 
 function showWord() {
-    document.getElementById('polish-word').innerText = words[current].polish;
-    document.getElementById('answer').value = '';
-    document.getElementById('answer').focus();
+  wordDiv.textContent = words[current].pl;
+  input.value = '';
+  input.focus();
 }
 
 function checkAnswer() {
-    const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
-    if (userAnswer === words[current].english.toLowerCase()) {
-        correct++;
-    }
-    current++;
-    if (current < words.length) {
-        showWord();
-    } else {
-        showSummary();
-    }
+  const userAnswer = input.value.trim().toLowerCase();
+  const correctAnswer = words[current].en.toLowerCase();
+  
+  if (userAnswer === correctAnswer) {
+    correct++;
+    feedbackDiv.textContent = "✅ Dobrze!";
+  } else {
+    feedbackDiv.textContent = `❌ Źle! Poprawna odpowiedź: ${words[current].en}`;
+  }
+
+  answers.push({ polski: words[current].pl, twoja: userAnswer, poprawna: words[current].en });
+  
+  current++;
+  if (current < words.length) {
+    setTimeout(() => {
+      feedbackDiv.textContent = "";
+      showWord();
+    }, 1000);
+  } else {
+    showResult();
+  }
 }
 
-function showSummary() {
-    document.querySelector('.quiz-container').innerHTML = `<h2>Podsumowanie</h2>
-        <p>Poprawne odpowiedzi: ${correct} z ${words.length}</p>
-        <h3>Wszystkie słówka:</h3>
-        <ul>${words.map(w => `<li>${w.polish} - ${w.english}</li>`).join('')}</ul>`;
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  resultDiv.style.display = 'block';
+  let html = `<h2>Koniec quizu!</h2>`;
+  html += `<p>Poprawnych odpowiedzi: ${correct} z ${words.length}</p>`;
+  html += "<ul>";
+  answers.forEach(ans => {
+    html += `<li><strong>${ans.polski}</strong> - Twoja odpowiedź: ${ans.twoja} (poprawna: ${ans.poprawna})</li>`;
+  });
+  html += "</ul>";
+  resultDiv.innerHTML = html;
 }
 
-document.getElementById('answer').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        checkAnswer();
-    }
+checkButton.addEventListener('click', checkAnswer);
+input.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    checkAnswer();
+  }
 });
 
 showWord();
 </script>
+
 </body>
 </html>
+
