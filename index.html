@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz ze słówek</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #74ebd5, #ACB6E5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+    .quiz-container {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+    }
+    input[type="text"] {
+        padding: 10px;
+        width: 80%;
+        margin: 15px 0;
+        border: 2px solid #74ebd5;
+        border-radius: 10px;
+        font-size: 1rem;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        background-color: #74ebd5;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #4ac1c0;
+    }
+    .summary {
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+    <h2 id="polish-word">Słówko</h2>
+    <input type="text" id="answer" placeholder="Wpisz po angielsku">
+    <br>
+    <button onclick="checkAnswer()">Sprawdź</button>
+    <div class="summary" id="summary"></div>
+</div>
+
+<script>
+const words = [
+    { polish: "równość", english: "equality" },
+    { polish: "dziczyzna", english: "game" },
+    { polish: "kopalnia", english: "mine" },
+    { polish: "mieć ochotę na coś / chcieć coś", english: "fancy" },
+    { polish: "zainteresowanie, uwaga", english: "attention" },
+    { polish: "mielone mięso", english: "mince meat" },
+    { polish: "handlować", english: "to trade" },
+    { polish: "potomkowie", english: "descendants" },
+    { polish: "obsada, lista wykonawców", english: "line-up" },
+    { polish: "obalać, powalić", english: "bring down" }
+];
+
+let current = 0;
+let correct = 0;
+
+function showWord() {
+    document.getElementById('polish-word').innerText = words[current].polish;
+    document.getElementById('answer').value = '';
+    document.getElementById('answer').focus();
+}
+
+function checkAnswer() {
+    const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+    if (userAnswer === words[current].english.toLowerCase()) {
+        correct++;
+    }
+    current++;
+    if (current < words.length) {
+        showWord();
+    } else {
+        showSummary();
+    }
+}
+
+function showSummary() {
+    document.querySelector('.quiz-container').innerHTML = `<h2>Podsumowanie</h2>
+        <p>Poprawne odpowiedzi: ${correct} z ${words.length}</p>
+        <h3>Wszystkie słówka:</h3>
+        <ul>${words.map(w => `<li>${w.polish} - ${w.english}</li>`).join('')}</ul>`;
+}
+
+document.getElementById('answer').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        checkAnswer();
+    }
+});
+
+showWord();
+</script>
+</body>
+</html>
